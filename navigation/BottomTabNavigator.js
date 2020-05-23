@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 
-import HomeScreen from '../screens/HomeScreen';
+import BrowseScreen from '../screens/BrowseScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
 import RankerScreen from '../screens/RankerScreen';
 
@@ -34,7 +34,7 @@ export default function BottomTabNavigator({ navigation, route }) {
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
       <BottomTab.Screen
         name="Browse"
-        component={HomeScreen}
+        component={BrowseScreen}
         options={{
           title: 'Browse',
           tabBarIcon: ({ focused }) => (
