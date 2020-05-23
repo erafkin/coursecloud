@@ -3,7 +3,7 @@ This is a final project for CS89 at Dartmouth College. We are using IBM's Watson
 
 ## Run
 - `yarn add expo-cli` (if you don't already have the expo cli)
-- clone this repository
+- clone this repository: `git clone git@github.com:erafkin/coursecloud.git`
 - `yarn install`
 - `expo start`
 - once prompted, press `i` for an iOS simulator
