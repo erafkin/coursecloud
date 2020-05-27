@@ -201,6 +201,24 @@ class BrowseScreen extends Component {
                   with a score of
                   {' '}
                   {doc.sentiment.document.score}
+                  {'. '}
+                  {doc.sentiment.targets.map((target) => {
+                    return (
+                      <Text key={target.text}>
+                        People felt that the
+                        {' '}
+                        {target.text}
+                        {' '}
+                        of the class was
+                        {' '}
+                        {target.label}
+                        {' '}
+                        with a score of
+                        {' '}
+                        {target.score}
+                      </Text>
+                    );
+                  })}
                 </Text>
               );
             } else {
