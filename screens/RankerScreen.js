@@ -13,6 +13,8 @@ class RankerScreen extends Component {
       course1: '',
       subject2: '',
       course2: '',
+      response1: '',
+      response2: '',
 
     };
   }
@@ -46,14 +48,35 @@ class RankerScreen extends Component {
       course1, course2, subject1, subject2,
     } = this.state;
     console.log(course1);
-    console.log(course2);
-    console.log(subject1);
-    console.log(subject2);
+    const promises = [];
+
+    promises.push(
+      new Promise((resolve, reject) => {
+        axios.post('http://localhost:3030/api/nlp', { subject: subject1, course: course1, targets: undefined }).then((resp) => {
+          resolve(resp.data.resp);
+        });
+      }),
+    );
+    promises.push(
+      new Promise((resolve, reject) => {
+        axios.post('http://localhost:3030/api/nlp', { subject: subject2, course: course2, targets: undefined }).then((resp) => {
+          resolve(resp.data.resp);
+        });
+      }),
+    );
+    Promise.all(promises).then((result) => {
+      this.setState({
+        response1: JSON.stringify(result[0]),
+        response2: JSON.stringify(result[1]),
+      });
+    });
   }
 
 
   render() {
-    const { subject1, subject2 } = this.state;
+    const {
+      subject1, subject2, response1, response2,
+    } = this.state;
     const subjects = [{ value: 'COSC' }, { value: 'ENGS' }, { value: 'ECON' }, { value: 'GOV' }, { value: 'PSYC' }];
     const courses = {
       COSC: [{ value: '1' }, { value: '10' }, { value: '11' }, { value: '16' }, { value: '22' }, { value: '24' }],
@@ -87,7 +110,16 @@ class RankerScreen extends Component {
           onChangeText={(val) => this.changeCourse(val, 2)}
         />
         <TouchableHighlight style={styles.subjectButton} onPress={() => { this.rank(); }}><Text style={styles.buttonWords}>Go!</Text></TouchableHighlight>
-
+        <Text>
+          {' '}
+          {response1}
+          {' '}
+        </Text>
+        <Text>
+          {' '}
+          {response2}
+          {' '}
+        </Text>
 
       </ScrollView>
     );
