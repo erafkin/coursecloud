@@ -202,23 +202,24 @@ class BrowseScreen extends Component {
                   {' '}
                   {doc.sentiment.document.score}
                   {'. '}
-                  {doc.sentiment.targets.map((target) => {
-                    return (
-                      <Text key={target.text}>
-                        People felt that the
-                        {' '}
-                        {target.text}
-                        {' '}
-                        of the class was
-                        {' '}
-                        {target.label}
-                        {' '}
-                        with a score of
-                        {' '}
-                        {target.score}
-                      </Text>
-                    );
-                  })}
+                  {doc.sentiment.targets
+                    ? doc.sentiment.targets.map((target) => {
+                      return (
+                        <Text key={target.text}>
+                          People felt that the
+                          {' '}
+                          {target.text}
+                          {' '}
+                          of the class was
+                          {' '}
+                          {target.label}
+                          {' '}
+                          with a score of
+                          {' '}
+                          {target.score}
+                        </Text>
+                      );
+                    }) : <View />}
                 </Text>
               );
             } else {

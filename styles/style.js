@@ -5,10 +5,7 @@ export default StyleSheet.create({
     backgroundColor: '#00693e',
     alignItems: 'center',
     width: '50%',
-    margin: '1%',
-    justifyContent: 'center',
     borderRadius: 5,
-    height: 30,
   },
   courseButton: {
     backgroundColor: '#00693e',
@@ -20,6 +17,7 @@ export default StyleSheet.create({
   buttonWords: {
     color: '#FFFFFF',
     fontSize: 14,
+    margin: '3%',
 
   },
 });
