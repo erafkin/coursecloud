@@ -155,9 +155,10 @@ class RankerScreen extends Component {
                   {errorMessage}
                   {' '}
                   there is no mention of
-                  {' '}
+                  {' "'}
                   {target}
-                  , please input a different target or class
+                  {'" '}
+                  , please input a different keyword, class, or use no keyword at all
                   {' '}
                 </Text>
               )
