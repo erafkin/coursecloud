@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, TextInput } from 'react-native';
 import { ScrollView, TouchableHighlight } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-material-dropdown';
 import axios from 'axios';
@@ -15,6 +15,7 @@ class RankerScreen extends Component {
       course2: '',
       response1: '',
       response2: '',
+      target: '',
 
     };
   }
@@ -43,23 +44,29 @@ class RankerScreen extends Component {
     }
   }
 
+  changeTarget = (text) => {
+    this.setState({
+      response1: '',
+      response2: '',
+      target: text,
+    });
+  }
+
   rank = () => {
     const {
-      course1, course2, subject1, subject2,
+      course1, course2, subject1, subject2, target,
     } = this.state;
-    console.log(course1);
     const promises = [];
-
     promises.push(
       new Promise((resolve, reject) => {
-        axios.post('http://localhost:3030/api/nlp', { subject: subject1, course: course1, targets: undefined }).then((resp) => {
+        axios.post('http://localhost:3030/api/nlp', { subject: subject1, course: course1, targets: target === '' ? undefined : [target] }).then((resp) => {
           resolve(resp.data.resp);
         });
       }),
     );
     promises.push(
       new Promise((resolve, reject) => {
-        axios.post('http://localhost:3030/api/nlp', { subject: subject2, course: course2, targets: undefined }).then((resp) => {
+        axios.post('http://localhost:3030/api/nlp', { subject: subject2, course: course2, targets: target === '' ? undefined : [target] }).then((resp) => {
           resolve(resp.data.resp);
         });
       }),
@@ -75,7 +82,7 @@ class RankerScreen extends Component {
 
   render() {
     const {
-      subject1, subject2, response1, response2,
+      subject1, subject2, course1, course2, response1, response2, target,
     } = this.state;
     let temp1 = [];
     let temp2 = [];
@@ -84,6 +91,8 @@ class RankerScreen extends Component {
     if (response2 !== '') temp2 = JSON.parse(response2);
     const resp2 = temp2[0];
 
+    console.log(resp1);
+    console.log(resp2);
     const subjects = [{ value: 'COSC' }, { value: 'ENGS' }, { value: 'ECON' }, { value: 'GOV' }, { value: 'PSYC' }];
     const courses = {
       COSC: [{ value: '1' }, { value: '10' }, { value: '11' }, { value: '16' }, { value: '22' }, { value: '24' }],
@@ -93,6 +102,16 @@ class RankerScreen extends Component {
       PSYC: [{ value: '1' }, { value: '6' }, { value: '10' }, { value: '11' }, { value: '28' }, { value: '35' }, { value: '36' }, { value: '37' }, { value: '38' }],
     };
 
+    let errorMessage = '';
+    if ((response1 !== '' && resp1.code !== undefined) || (response2 !== '' && resp2.code !== undefined)) {
+      if (resp1.code !== undefined && resp2.code !== undefined) {
+        errorMessage = `${subject1}${course1} and ${subject2}${course2}`;
+      } else if (resp1.code !== undefined) {
+        errorMessage = `${subject1}${course1}`;
+      } else if (resp2.code !== undefined) {
+        errorMessage = `${subject2}${course2}`;
+      }
+    }
     return (
       <ScrollView>
         <View style={{ flexDirection: 'column', margin: '5%' }}>
@@ -106,7 +125,7 @@ class RankerScreen extends Component {
             data={subject1 === '' ? [] : courses[subject1]}
             onChangeText={(val) => this.changeCourse(val, 1)}
           />
-          <Text>VS</Text>
+          <Text style={{ textAlign: 'center' }}>VS</Text>
           <Dropdown
             label="Subject"
             data={subjects}
@@ -117,34 +136,65 @@ class RankerScreen extends Component {
             data={subject2 === '' ? [] : courses[subject2]}
             onChangeText={(val) => this.changeCourse(val, 2)}
           />
-          <TouchableHighlight style={styles.subjectButton} onPress={() => { this.rank(); }}><Text style={styles.buttonWords}>Go!</Text></TouchableHighlight>
-          {(response1 !== '' && response2 !== '')
-            ? (
-              <View>
-                { resp1.sentiment.document.score > resp2.sentiment.document.score ? (
-                  <Text>
-                    people liked
-                    {' '}
-                    {resp1.course}
-                    {' '}
-                    more than
-                    {' '}
-                    {resp2.course}
-                  </Text>
-                ) : (
-                  <Text>
-                    people liked
-                    {' '}
-                    {resp2.course}
-                    {' '}
-                    more than
-                    {' '}
-                    {resp1.course}
-                  </Text>
-                )}
-              </View>
-            )
-            : <View />}
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+            onChangeText={(text) => this.changeTarget(text)}
+            placeholder="eg. difficulty"
+            value={target}
+          />
+
+          <View style={{ alignItems: 'center' }}>
+            <TouchableHighlight style={styles.goButton} onPress={() => { this.rank(); }}><Text style={styles.buttonWords}>Go!</Text></TouchableHighlight>
+          </View>
+          <View>
+            {(response1 !== '' && resp1.code !== undefined) || (response2 !== '' && resp2.code !== undefined)
+              ? (
+                <Text>
+                  In
+                  {' '}
+                  {errorMessage}
+                  {' '}
+                  there is no mention of
+                  {' '}
+                  {target}
+                  , please input a different target or class
+                  {' '}
+                </Text>
+              )
+              : (
+                <View>
+                  {response1 !== '' && response2 !== ''
+                    ? (
+                      <View>
+                        { (resp1.sentiment.document.score > resp2.sentiment.document.score) ? (
+                          <Text>
+                            people liked
+                            {' '}
+                            {resp1.course}
+                            {' '}
+                            more than
+                            {' '}
+                            {resp2.course}
+                          </Text>
+                        ) : (
+                          <Text>
+                            people liked
+                            {' '}
+                            {resp2.course}
+                            {' '}
+                            more than
+                            {' '}
+                            {resp1.course}
+                          </Text>
+                        )}
+                      </View>
+                    )
+                    : <View />}
+                </View>
+              )}
+
+          </View>
+
         </View>
 
       </ScrollView>
