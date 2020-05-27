@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { ScrollView, TouchableHighlight } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-material-dropdown';
 import axios from 'axios';
@@ -77,6 +77,13 @@ class RankerScreen extends Component {
     const {
       subject1, subject2, response1, response2,
     } = this.state;
+    let temp1 = [];
+    let temp2 = [];
+    if (response1 !== '') temp1 = JSON.parse(response1);
+    const resp1 = temp1[0];
+    if (response2 !== '') temp2 = JSON.parse(response2);
+    const resp2 = temp2[0];
+
     const subjects = [{ value: 'COSC' }, { value: 'ENGS' }, { value: 'ECON' }, { value: 'GOV' }, { value: 'PSYC' }];
     const courses = {
       COSC: [{ value: '1' }, { value: '10' }, { value: '11' }, { value: '16' }, { value: '22' }, { value: '24' }],
@@ -88,38 +95,57 @@ class RankerScreen extends Component {
 
     return (
       <ScrollView>
-        <Dropdown
-          label="Subject"
-          data={subjects}
-          onChangeText={(val) => this.changeSubject(val, 1)}
-        />
-        <Dropdown
-          label="Course"
-          data={subject1 === '' ? [] : courses[subject1]}
-          onChangeText={(val) => this.changeCourse(val, 1)}
-        />
-        <Text>VS</Text>
-        <Dropdown
-          label="Subject"
-          data={subjects}
-          onChangeText={(val) => this.changeSubject(val, 2)}
-        />
-        <Dropdown
-          label="Course"
-          data={subject2 === '' ? [] : courses[subject2]}
-          onChangeText={(val) => this.changeCourse(val, 2)}
-        />
-        <TouchableHighlight style={styles.subjectButton} onPress={() => { this.rank(); }}><Text style={styles.buttonWords}>Go!</Text></TouchableHighlight>
-        <Text>
-          {' '}
-          {response1}
-          {' '}
-        </Text>
-        <Text>
-          {' '}
-          {response2}
-          {' '}
-        </Text>
+        <View style={{ flexDirection: 'column', margin: '5%' }}>
+          <Dropdown
+            label="Subject"
+            data={subjects}
+            onChangeText={(val) => this.changeSubject(val, 1)}
+          />
+          <Dropdown
+            label="Course"
+            data={subject1 === '' ? [] : courses[subject1]}
+            onChangeText={(val) => this.changeCourse(val, 1)}
+          />
+          <Text>VS</Text>
+          <Dropdown
+            label="Subject"
+            data={subjects}
+            onChangeText={(val) => this.changeSubject(val, 2)}
+          />
+          <Dropdown
+            label="Course"
+            data={subject2 === '' ? [] : courses[subject2]}
+            onChangeText={(val) => this.changeCourse(val, 2)}
+          />
+          <TouchableHighlight style={styles.subjectButton} onPress={() => { this.rank(); }}><Text style={styles.buttonWords}>Go!</Text></TouchableHighlight>
+          {(response1 !== '' && response2 !== '')
+            ? (
+              <View>
+                { resp1.sentiment.document.score > resp2.sentiment.document.score ? (
+                  <Text>
+                    people liked
+                    {' '}
+                    {resp1.course}
+                    {' '}
+                    more than
+                    {' '}
+                    {resp2.course}
+                  </Text>
+                ) : (
+                  <Text>
+                    people liked
+                    {' '}
+                    {resp2.course}
+                    {' '}
+                    more than
+                    {' '}
+                    {resp1.course}
+                  </Text>
+                )}
+              </View>
+            )
+            : <View />}
+        </View>
 
       </ScrollView>
     );
