@@ -53,7 +53,7 @@ class ChatbotScreen extends Component {
   messageScreen = () => {
     const { messages } = this.state;
     if (messages.length === 0) {
-      return <Text>no messages</Text>;
+      return <View />;
     } else {
       return (
         <ScrollView style={{ maxHeight: 430 }} ref={(component) => { this._scrollView = component; }} onContentSizeChange={() => this._scrollView.scrollToEnd({ animated: true })}>
