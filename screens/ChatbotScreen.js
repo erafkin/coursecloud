@@ -18,7 +18,9 @@ class ChatbotScreen extends Component {
 
   startNewSession = () => {
     axois.get('http://localhost:3030/api/chatbot/session').then((response) => {
-      this.setState({ sessionId: response.data });
+      this.setState({
+        sessionId: response.data.response.session_id,
+      });
     }).catch((error) => {
       console.log(error);
     });
@@ -28,13 +30,15 @@ class ChatbotScreen extends Component {
     const { messages } = this.state;
     messages.push({ message: m, fromWatson: (user !== 'client'), key: messages.length });
     this.setState({
+      currMessage: '',
       messages,
     });
   }
 
-  messageAPI = (message) => {
-    const testSessionID = 'c010ea64-570d-416c-898d-93c69421cd59';
-    axois.post('http://localhost:3030/api/chatbot/message', { sessionId: testSessionID, text: message })
+  messageAPI = (message, sessionId) => {
+    console.log(sessionId);
+    // const testSessionID = '0e1735ab-b40e-4839-8d9f-0e4ee99b8104';
+    axois.post('http://localhost:3030/api/chatbot/message', { sessionId, message })
       .then((response) => {
         this.handleMessage(response.data.response.output.generic[0].text, 'watson');
       });
@@ -52,7 +56,7 @@ class ChatbotScreen extends Component {
       return <Text>no messages</Text>;
     } else {
       return (
-        <ScrollView style={{ maxHeight: 430, backgroundColor: 'blue' }}>
+        <ScrollView style={{ maxHeight: 430 }} ref={(component) => { this._scrollView = component; }} onContentSizeChange={() => this._scrollView.scrollToEnd({ animated: true })}>
           {this.indivMessage(messages)}
         </ScrollView>
       );
@@ -61,7 +65,6 @@ class ChatbotScreen extends Component {
 
   indivMessage = (messages) => {
     return (messages.map((mes) => {
-      console.log(mes);
       return mes.fromWatson
         ? (
           <View style={styles.watsonMessageContainer} key={mes.key}>
@@ -111,7 +114,7 @@ class ChatbotScreen extends Component {
               placeholder="type here"
               value={currMessage}
             />
-            <TouchableHighlight onPress={() => { this.handleMessage(currMessage, 'client'); this.messageAPI(currMessage); }} style={styles.courseButton}>
+            <TouchableHighlight onPress={() => { this.handleMessage(currMessage, 'client'); this.messageAPI(currMessage, sessionId); }} style={styles.courseButton}>
               <Text style={styles.buttonWords}> send</Text>
             </TouchableHighlight>
           </View>
