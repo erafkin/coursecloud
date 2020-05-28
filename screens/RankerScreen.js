@@ -90,9 +90,6 @@ class RankerScreen extends Component {
     const resp1 = temp1[0];
     if (response2 !== '') temp2 = JSON.parse(response2);
     const resp2 = temp2[0];
-
-    console.log(resp1);
-    console.log(resp2);
     const subjects = [{ value: 'COSC' }, { value: 'ENGS' }, { value: 'ECON' }, { value: 'GOV' }, { value: 'PSYC' }];
     const courses = {
       COSC: [{ value: '1' }, { value: '10' }, { value: '11' }, { value: '16' }, { value: '22' }, { value: '24' }],
@@ -169,7 +166,7 @@ class RankerScreen extends Component {
                       <View>
                         { (resp1.sentiment.document.score > resp2.sentiment.document.score) ? (
                           <Text>
-                            people liked
+                            Overall, people liked
                             {' '}
                             {resp1.course}
                             {' '}
@@ -179,7 +176,7 @@ class RankerScreen extends Component {
                           </Text>
                         ) : (
                           <Text>
-                            people liked
+                            Overall, people liked
                             {' '}
                             {resp2.course}
                             {' '}
@@ -188,6 +185,44 @@ class RankerScreen extends Component {
                             {resp1.course}
                           </Text>
                         )}
+                        {target === '' ? <View />
+                          : (
+                            <View>
+                              <Text>
+                                People in
+                                {' '}
+                                {resp1.course}
+                                {' '}
+                                felt
+                                {' '}
+                                {resp1.sentiment.targets[0].label}
+                                {' '}
+                                about the class&apos;
+                                {' '}
+                                {target}
+                                {' '}
+                                with a score of
+                                {' '}
+                                {resp1.sentiment.targets[0].score}
+                                {' '}
+                                and people in
+                                {' '}
+                                {resp2.course}
+                                {' '}
+                                felt
+                                {' '}
+                                {resp2.sentiment.targets[0].label}
+                                {' '}
+                                about the class&apos;
+                                {' '}
+                                {target}
+                                {' '}
+                                with a score of
+                                {' '}
+                                {resp2.sentiment.targets[0].score}
+                              </Text>
+                            </View>
+                          )}
                       </View>
                     )
                     : <View />}
