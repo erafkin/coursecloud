@@ -26,4 +26,10 @@ export default StyleSheet.create({
     margin: '3%',
     width: 20,
   },
+  goButton: {
+    backgroundColor: '#00693e',
+    alignItems: 'center',
+    width: '100%',
+    borderRadius: 5,
+  },
 });
