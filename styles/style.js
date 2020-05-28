@@ -18,7 +18,13 @@ export default StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     margin: '3%',
-
+    width: 62,
+  },
+  buttonGo: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    margin: '3%',
+    width: 20,
   },
   goButton: {
     backgroundColor: '#00693e',
