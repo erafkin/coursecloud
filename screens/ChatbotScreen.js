@@ -28,15 +28,44 @@ class ChatbotScreen extends Component {
 
   handleMessage = (m, user) => {
     const { messages } = this.state;
-    messages.push({ message: m, fromWatson: (user !== 'client'), key: messages.length });
+    const finalMessage = m.split(' ');
+    if (finalMessage[0] === 'DONE:') {
+      messages.push({ message: 'Ok! We are searching our records to find some classes for you', fromWatson: (user !== 'client'), key: messages.length });
+      this.searchForClasses(finalMessage[1], finalMessage[2]);
+    } else {
+      messages.push({ message: m, fromWatson: (user !== 'client'), key: messages.length });
+    }
     this.setState({
       currMessage: '',
       messages,
     });
   }
 
+  searchForClasses = (subject, keyword) => {
+    axois.post('http://localhost:3030/api/nlp', { subject, targets: [keyword] })
+      .then((response) => {
+        const { resp } = response.data;
+        let answer = '';
+        let best = '';
+        const bestScore = -2;
+        for (let i = 0; i < resp.length; i++) {
+          if (resp[i].course !== undefined) {
+            if (resp[i].sentiment.targets[0].label === 'positive') {
+              answer += `${resp[i].course} `;
+              if (resp[i].sentiment.document.score > bestScore) best = resp[i].course;
+            }
+          }
+        }
+        if (best !== '') {
+          const message = `All of the classes in the ${subject} department where students felt postive about ${keyword} are: ${answer}. The most liked class was ${best}`;
+          this.handleMessage(message, 'watson');
+        } else {
+          this.handleMessage('we couldn\'t find any classes that matched those requirements', 'watson');
+        }
+      });
+  }
+
   messageAPI = (message, sessionId) => {
-    console.log(sessionId);
     // const testSessionID = '0e1735ab-b40e-4839-8d9f-0e4ee99b8104';
     axois.post('http://localhost:3030/api/chatbot/message', { sessionId, message })
       .then((response) => {
