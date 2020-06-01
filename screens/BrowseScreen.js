@@ -7,7 +7,6 @@ import {
   Table, Row,
 } from 'react-native-table-component';
 import DropDownPicker from 'react-native-dropdown-picker';
-import MultiSelect from 'react-native-multiple-select';
 import axios from 'axios';
 import styles from '../styles/style';
 
@@ -262,8 +261,8 @@ class BrowseScreen extends Component {
           {this.getTargetOptions()}
           <View>
             <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', flexWrap: 'wrap' }}>
-              <TouchableHighlight style={styles.courseButton} onPress={() => { this.setCourseAndSubject(course, undefined); }}><Text style={styles.buttonWords}>Clear Subject</Text></TouchableHighlight>
-              <TouchableHighlight style={styles.courseButton} onPress={() => { this.setCourseAndSubject(undefined, subject); }}><Text style={styles.buttonWords}>Clear Course</Text></TouchableHighlight>
+              <TouchableHighlight style={styles.courseButton} onPress={() => { this.setCourse(undefined); }}><Text style={styles.buttonWords}>Clear Subject</Text></TouchableHighlight>
+              <TouchableHighlight style={styles.courseButton} onPress={() => { this.setSubject(undefined); }}><Text style={styles.buttonWords}>Clear Course</Text></TouchableHighlight>
               <TouchableHighlight style={styles.courseButton} onPress={() => { this.clearTarget(); }}><Text style={styles.buttonWords}>Clear Focus</Text></TouchableHighlight>
             </View>
             <View>
@@ -291,57 +290,74 @@ class BrowseScreen extends Component {
               <TouchableHighlight style={styles.subjectButton} onPress={() => { this.nlp(); }}><Text style={styles.buttonGo}>Go!</Text></TouchableHighlight>
             </View>
             <Text style={{ fontSize: 16, fontWeight: '700' }}> Results: </Text>
-            {nlp.map((doc) => {
-              if (typeof doc === 'object') {
-                const k = `${doc.course}_key`;
-                return (
-                  <View style={{ flexDirection: 'column' }}>
-                    <Text key={k}>
-                      The general sentiment for
-                      {' '}
-                      {doc.course}
-                      {' '}
-                      was
-                      {' '}
-                      {doc.sentiment.document.label}
-                      {' '}
-                      with a score of
-                      {' '}
-                      {doc.sentiment.document.score}
-                      {' '}
-                      on a scale from -1 to 1
-                      {'. '}
-                      {doc.sentiment.targets
-                        ? doc.sentiment.targets.map((target) => {
-                          const key = `${target.text}_key`;
-                          return (
-                            <Text key={key}>
-                              People felt that the
-                              {' '}
-                              {target.text}
-                              {' '}
-                              of the class was
-                              {' '}
-                              {target.label}
-                              {' '}
-                              with a score of
-                              {' '}
-                              {target.score}
-                              {'.'}
-                            </Text>
-                          );
-                        }) : <View />}
-                    </Text>
-                    <Text>
-                      Below are the top 5 relevant keywords found within the course reviews, followed by their sentiments:
-                    </Text>
-                    {doc.keywords ? this.keywordTable(doc) : <View />}
-                  </View>
-                );
-              } else {
-                return (<View />);
-              }
-            })}
+            {(targets === undefined)
+              ? (
+                <View />
+              )
+              : (
+                <View>
+                  {nlp.map((doc) => {
+                    if (doc.sentiment !== undefined) {
+                      const k = `${doc.course}_key`;
+                      return (
+                        <View style={{ flexDirection: 'column' }}>
+                          <Text key={k}>
+                            The general sentiment for
+                            {' '}
+                            {doc.course}
+                            {' '}
+                            was
+                            {' '}
+                            {doc.sentiment.document.label}
+                            {' '}
+                            with a score of
+                            {' '}
+                            {doc.sentiment.document.score}
+                            {' '}
+                            on a scale from -1 to 1
+                            {'. '}
+                            {doc.sentiment.targets
+                              ? doc.sentiment.targets.map((target) => {
+                                const key = `${target.text}_key`;
+                                return (
+                                  <Text key={key}>
+                                    People felt that the
+                                    {' '}
+                                    {target.text}
+                                    {' '}
+                                    of the class was
+                                    {' '}
+                                    {target.label}
+                                    {' '}
+                                    with a score of
+                                    {' '}
+                                    {target.score}
+                                    {'.'}
+                                  </Text>
+                                );
+                              }) : <View />}
+                          </Text>
+                          <Text>
+                            Below are the top 5 relevant keywords found within the course reviews, followed by their sentiments:
+                          </Text>
+                          {doc.keywords ? this.keywordTable(doc) : <View />}
+                        </View>
+                      );
+                    } else {
+                      return (
+                        <Text>
+                          There was no mention of
+                          {' "'}
+                          {targets}
+                          {'" '}
+                          in the specified course. Please input a different focus (or no focus), or a different class.
+                          {' '}
+                        </Text>
+                      );
+                    }
+                  })}
+                </View>
+              )}
           </View>
 
         </View>
